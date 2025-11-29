@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useGetEmployees } from "../hooks/employeeHooks";
 
 import {
   Table,
@@ -20,43 +21,43 @@ import {
 } from "../components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 
-
-const employees = [
-  {
-    id: "e001",
-    firstName: "Alice",
-    lastName: "Smith",
-    department: "Engineering",
-    email: "alice.s@corp.com"
-  },
-  {
-    id: "e002",
-    firstName: "Bob",
-    lastName: "Johnson",
-    department: "Marketing",
-    email: "bob.j@corp.com"
-  },
-]
-
 export function Dashboard() {
     const navigate = useNavigate();
+
+    const { data: response, error } = useGetEmployees();
+
+    const employees = response?.data || [];
 
     const handleAddEmployee = () => {
         navigate("/add")
     };
 
     const handleDetails = (employeeId) => {
-        console.log(`Viewing details for employee: ${employeeId}`);
+        navigate(`/details/${employeeId}`);
     };
 
     const handleEdit = (employeeId) => {
-        console.log(`Editing employee: ${employeeId}`);
+        navigate(`/update/${employeeId}`);
     };
 
     const handleDelete = (employeeId) => {
-        console.log(`Deleting employee: ${employeeId}`);
+        navigate(`/delete/${employeeId}`);
     };
-        
+
+    if (error) {
+         return (
+            <div className="flex items-center justify-center min-h-screen p-6 bg-gray-50">
+                <div className="p-8 max-w-lg w-full bg-white rounded-xl shadow-xl border-l-4 border-red-500">
+                    <h1 className="text-xl font-bold text-red-700 mb-2">Error Loading Data</h1>
+                    <p className="text-gray-600">{error.message}</p>
+                    <Button className="mt-6" onClick={() => window.location.reload()}>
+                        Try Again
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         
         <div className="p-6">
@@ -83,37 +84,45 @@ export function Dashboard() {
                     </TableHeader>
                     
                     <TableBody>
-                        {employees.map((employee) => (
-                            <TableRow key={employee.id}>
-                                <TableCell className="font-medium">{`${employee.firstName} ${employee.lastName}`}</TableCell>
-                                <TableCell>{employee.department}</TableCell>
-                                <TableCell>{employee.email}</TableCell>
-                                
-                                <TableCell className="text-center">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem onClick={() => handleDetails(employee.id)}>
-                                                View Details
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleEdit(employee.id)}>
-                                                Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => handleDelete(employee.id)} className="text-red-600">
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                        {employees.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center text-gray-500 py-6">
+                                    No employee records found.
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        ) : (
+                            employees.map((employee) => (
+                                <TableRow key={employee.id}>
+                                    <TableCell className="font-medium">{`${employee.first_name} ${employee.last_name}`}</TableCell>
+                                    <TableCell>{employee.department}</TableCell>
+                                    <TableCell>{employee.email}</TableCell>
+                                    
+                                    <TableCell className="text-center">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => handleDetails(employee.employee_id)}>
+                                                    View Details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleEdit(employee.employee_id)}>
+                                                    Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem onClick={() => handleDelete(employee.employee_id)} className="text-red-600">
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>

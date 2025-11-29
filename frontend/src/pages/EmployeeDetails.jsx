@@ -22,7 +22,8 @@ export function EmployeeDetails() {
     const { employeeId } = useParams();
     const navigate = useNavigate();
 
-    const { data: employee, error } = useGetEmployeeDetails(employeeId);
+    const { data: response, error } = useGetEmployeeDetails(employeeId);
+    const employee = response?.data || [];
 
     const fullName = employee ? `${employee.first_name} ${employee.last_name}` : 'Employee Record';
 
@@ -75,14 +76,12 @@ export function EmployeeDetails() {
                     
                     <h3 className="text-xl font-semibold text-gray-700 mt-4 border-b pb-1">Contact & Personal</h3>
                     <DetailField label="Email" value={employee.email} />
-                    <DetailField label="Phone" value={employee.phone} />
                     
                     <h3 className="text-xl font-semibold text-gray-700 mt-8 border-b pb-1">Employment Details</h3>
                     <DetailField label="Position" value={employee.position} />
                     <DetailField label="Department" value={employee.department} />
-                    <DetailField label="Annual Salary" value={employee.salary} />
-                    <DetailField label="Date of Joining" value={employee.date_of_joining} />
-                    <DetailField label="Status" value={employee.status} />
+                    <DetailField label="Salary" value={employee.salary} />
+                    <DetailField label="Date of Joining" value={employee.date_of_joining?.split('T')[0]} />
 
                 </CardContent>
                 
@@ -96,13 +95,13 @@ export function EmployeeDetails() {
                     <div className="flex gap-3">
                         <Button 
                             variant="destructive" 
-                            onClick={() => navigate(`/delete/${employee.id}`)}
+                            onClick={() => navigate(`/delete/${employee.employee_id}`)}
                             className="bg-red-500 hover:bg-red-600"
                         >
                             Delete
                         </Button>
                         <Button 
-                            onClick={() => navigate(`/update/${employee.id}`)}
+                            onClick={() => navigate(`/update/${employee.employee_id}`)}
                         >
                             Edit Details
                         </Button>

@@ -14,25 +14,19 @@ export const fetchEmployeeById = async (id) => {
 }
 
 export const createEmployee = async (employeeData) => {
-    const response = await api.post(`/emp/employees`, employeeData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    const response = await api.post(`/emp/employees`, employeeData)
 
     return response.data;
 }
 
 export const updateEmployee = async (id, employeeData) => {
-    const response = await api.put(`/emp/employees/${id}`, employeeData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    const response = await api.put(`/emp/employees/${id}`, employeeData)
 
     return response.data;
 }
 
 export const deleteEmployee = async (id) => {
-    const response = await api.delete(`/emp/employees`, {
-        params: {eid: id}
-    })
+    const response = await api.delete(`/emp/employees/${id}`)
 
     return response.data;
 }

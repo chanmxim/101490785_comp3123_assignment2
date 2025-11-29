@@ -26,7 +26,7 @@ export function DeleteEmployee() {
         if (deleteSuccess) {
             const timer = setTimeout(() => {
                 navigate("/dashboard");
-            }, 2000);
+            }, 5000);
             
             return () => clearTimeout(timer);
         }
@@ -39,7 +39,7 @@ export function DeleteEmployee() {
             return;
         }
         // Trigger the deletion mutation
-        deleteMutate({ id: employeeId });
+        deleteMutate(employeeId);
     };
 
     if (deleteSuccess) {
@@ -50,7 +50,7 @@ export function DeleteEmployee() {
                         <svg className="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <CardTitle className="text-green-700">Deletion Successful</CardTitle>
                         <p className="text-gray-600">Employee ID **{employeeId}** has been permanently removed.</p>
-
+                        <p className="text-gray-600">Redirecting to the dashboard in 5 seconds...</p>
                     </CardContent>
                 </Card>
             </div>

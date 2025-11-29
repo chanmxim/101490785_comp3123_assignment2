@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAddEmployee  } from "../hooks/employeeHooks";
 
 import { Button } from "../components/ui/button"
 import {
@@ -24,8 +25,8 @@ const initialEmployeeState = {
 
 export function AddEmployee() {
     const [employee, setEmployee] = useState(initialEmployeeState);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    
+    const { mutate, isSuccess, error } = useAddEmployee();
 
     const navigate = useNavigate();
 
@@ -39,25 +40,41 @@ export function AddEmployee() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
-        setSuccess(false);
         
-        try {
-            // Submit process ...
-
-            // Success handling
-            setSuccess(true);
-            setEmployee(initialEmployeeState); // Clear the form
+        const payload = {
+            ...employee,
+            salary: parseFloat(employee.salary) || 0,
+        };
+        
+        mutate(payload);
+    };
+    
+    // Handle successful submission (side effect)
+    useEffect(() => {
+        if (isSuccess) {
+            setEmployee(initialEmployeeState); 
             
             // Redirect to the dashboard after a short delay
-            setTimeout(() => {
+            const timer = setTimeout(() => {
                 navigate("/dashboard");
-            }, 1500);
+            }, 5000);
 
-        } catch (err) {
-            setError(err.message || "An unknown error occurred during submission.");
+            return () => clearTimeout(timer); // Cleanup timer
         }
+
+    }, [isSuccess, navigate]);
+
+    const getErrorMessage = (err) => {
+        if (!err) return "An unknown error occurred.";
+        
+        // Prioritize a custom message if available
+        // This is crucial for displaying complex error objects (like Axios errors) safely
+        if (err.message) return err.message;
+        
+        // Fallback to string representation
+        return String(err);
     };
+
 
     return (
         <div className="flex items-center justify-center min-h-screen p-4 bg-gray-50">
@@ -71,12 +88,12 @@ export function AddEmployee() {
                         {/* Status Messages */}
                         {error && (
                             <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                                Error: {error}
+                                Error: {getErrorMessage(error)}
                             </div>
                         )}
-                        {success && (
+                        {isSuccess && (
                             <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                                Success! Employee added.
+                                Success! Employee added. Redirecting to the dashboard in 5 seconds...
                             </div>
                         )}
                         

@@ -30,7 +30,8 @@ export function UpdateEmployee() {
 
     const [employee, setEmployee] = useState(initialEmployeeState); 
 
-    const { data: fetchedEmployee } = useGetEmployeeDetails(employeeId);
+    const { data: response } = useGetEmployeeDetails(employeeId);
+    const fetchedEmployee = response?.data || [];
 
     const { 
         mutate, 
@@ -55,7 +56,7 @@ export function UpdateEmployee() {
         if (updateSuccess) {
             setTimeout(() => {
                 navigate("/dashboard");
-            }, 1500);
+            }, 5000);
         }
     }, [updateSuccess, navigate]);
 
@@ -99,7 +100,7 @@ export function UpdateEmployee() {
                             )}
                             {updateSuccess && (
                                 <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                                    Success! Employee updated. Redirecting to Dashboard...
+                                    Success! Employee updated. Redirecting to the dashboard in 5 seconds...
                                 </div>
                             )}
                             
