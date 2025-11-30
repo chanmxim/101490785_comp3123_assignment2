@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../components/ui/button"
@@ -12,20 +12,41 @@ import {
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 
+import { useLogin } from "../../hooks/authHooks";
+
+const initialState = {
+    email: "",
+    password: "",
+};
+
 export function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [credentials, setCredentials] = useState(initialState);
+    const { mutate, isSuccess, error } = useLogin();
 
     const navigate = useNavigate();
 
-    const handleSignupRedirect = () => {
-        navigate("/signup");
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setCredentials((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
     };
 
-    const handleLogin = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Submitted:", { email, password });
+        mutate(credentials);
     };
+
+    useEffect(() => {
+            if (isSuccess) {
+                setCredentials(initialState);
+
+                const timer = setTimeout(() => navigate("/dashboard"), 5000);
+
+                return () => clearTimeout(timer);
+            }
+        }, [isSuccess, navigate]);
 
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -34,8 +55,20 @@ export function Login() {
                     <CardTitle>Login to your account</CardTitle>
                 </CardHeader>
 
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleSubmit}>
                     <CardContent>
+                        {/* Status Messages */}
+                        {error && (
+                            <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                                Error: {error.message}
+                            </div>
+                        )}
+                        {isSuccess && (
+                            <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                                Login successful! Redirecting to dashboard in 5 seconds...
+                            </div>
+                        )}
+
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
@@ -44,8 +77,8 @@ export function Login() {
                                 type="email"
                                 placeholder="example@domain.com"
                                 required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={credentials.email}
+                                onChange={handleChange}
                             />
                             </div>
                             <div className="grid gap-2">
@@ -56,8 +89,8 @@ export function Login() {
                                     id="password" 
                                     type="password" 
                                     required 
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={credentials.password}
+                                    onChange={handleChange}
                                 />
                             </div>
                         </div>
@@ -70,7 +103,7 @@ export function Login() {
                         <Button 
                             variant="outline" 
                             className="w-full" 
-                            onClick={handleSignupRedirect}
+                            onClick={() => navigate("/signup")}
                         >
                             Proceed to Sign up
                         </Button>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../components/ui/button"
@@ -12,20 +12,40 @@ import {
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 
+import { useSignup } from "../../hooks/authHooks";
+
+const initialUserState = {
+    username: "",
+    email: "",
+    password: "",
+};
+
 export function Signup() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [user, setUser] = useState(initialUserState);
+    const { mutate, isSuccess, error } = useSignup();
 
     const navigate = useNavigate();
 
-    const handleLoginRedirect = () => {
-        navigate("/login");
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setUser((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
     };
 
-    const handleSignup = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Submitted:", { email, password });
+        mutate(user);
     };
+
+    useEffect(() => {
+        if (isSuccess) {
+            setUser(initialUserState);
+            const timer = setTimeout(() => navigate("/login"), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [isSuccess, navigate]);
 
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -34,9 +54,32 @@ export function Signup() {
                     <CardTitle>Create an account</CardTitle>
                 </CardHeader>
 
-                <form onSubmit={handleSignup}>
+                <form onSubmit={handleSubmit}>
                     <CardContent>
+                        {/* Status Messages */}
+                        {error && (
+                            <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                                Error: {error.message}
+                            </div>
+                        )}
+                        {isSuccess && (
+                            <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                                Account created! Redirecting to login in 5 seconds...
+                            </div>
+                        )}
+
                         <div className="flex flex-col gap-6">
+                            <div className="grid gap-2">
+                            <Label htmlFor="username">Username</Label>
+                            <Input
+                                id="username"
+                                type="text"
+                                placeholder="Enter your username"
+                                required
+                                value={user.username}
+                                onChange={handleChange}
+                            />
+                            </div>
                             <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
@@ -44,8 +87,8 @@ export function Signup() {
                                 type="email"
                                 placeholder="example@domain.com"
                                 required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={user.email}
+                                onChange={handleChange}
                             />
                             </div>
                             <div className="grid gap-2">
@@ -56,8 +99,8 @@ export function Signup() {
                                     id="password" 
                                     type="password" 
                                     required 
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={user.password}
+                                    onChange={handleChange}
                                 />
                             </div>
                         </div>
@@ -70,7 +113,7 @@ export function Signup() {
                         <Button 
                             variant="outline" 
                             className="w-full" 
-                            onClick={handleLoginRedirect}
+                            onClick={() => navigate("/login")}
                         >
                             Proceed to Login
                         </Button>

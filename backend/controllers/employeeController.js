@@ -33,6 +33,33 @@ export const getAllEmployees = async (req, res) => {
     }
 }
 
+export const searchEmployeesByDepartment = async (req, res) => {
+    try {
+        const { department } = req.query;
+    
+        if (!department) {
+            return res.status(400).json({
+                status: false,
+                message: "Department query parameter is required"
+            });    
+        }
+
+        const employees = await Employee.find({ department: department.trim() });
+
+        return res.status(200).json({
+            status: true,
+            data: employees
+        });
+
+    } catch (err){
+        console.log("Error: ", err);
+        return res.status(500).json({
+            status: false,
+            message: "Internal server error"
+        })
+    }
+}
+
 export const createEmployee = async (req, res) => {
     try{
         // Validate errors

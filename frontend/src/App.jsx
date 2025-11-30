@@ -20,8 +20,9 @@ const queryClient = new QueryClient({
     }
 });
 
-const PrivateRoute = ({ children }) => {
+const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useSelector((state) => state.auth);
+
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -36,11 +37,33 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />}/>
             <Route path="/signup" element={<Signup />}/>
-            <Route path="/dashboard" element={<Dashboard />}/>
-            <Route path="/add" element={<AddEmployee />}/>
-            <Route path="/update/:employeeId" element={<UpdateEmployee />}/>
-            <Route path="/delete/:employeeId" element={<DeleteEmployee />}/>
-            <Route path="/details/:employeeId" element={<EmployeeDetails />}/>
+
+
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+              }/>
+            <Route path="/add" element={
+              <ProtectedRoute>
+                <AddEmployee />
+              </ProtectedRoute>
+              }/>
+            <Route path="/update/:employeeId" element={
+              <ProtectedRoute>
+                <UpdateEmployee />
+              </ProtectedRoute>
+              }/>
+            <Route path="/delete/:employeeId" element={
+              <ProtectedRoute>
+                <DeleteEmployee />
+              </ProtectedRoute>
+              }/>
+            <Route path="/details/:employeeId" element={
+              <ProtectedRoute>
+                <EmployeeDetails />
+              </ProtectedRoute>
+              }/>
           </Routes>  
         </BrowserRouter>
 

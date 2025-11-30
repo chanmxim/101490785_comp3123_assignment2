@@ -3,6 +3,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { validationResult } from "express-validator";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -100,11 +101,17 @@ export const login = async (req, res) => {
                 message: "Invalid credentials (password)"
             })
         }
+        
+        const token = jwt.sign(
+            { id: user._id, username: user.username }, // payload
+            process.env.JWT_SECRET, // secret key
+            { expiresIn: process.env.JWT_EXPIRES_IN || "1d" } // token expiration
+        );
 
         return res.status(200).json({
             status: true,
             message: "Login successful.",
-            jwt_token: "Optional implementation"
+            token: token
 
         })
 

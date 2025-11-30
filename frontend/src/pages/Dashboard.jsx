@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useGetEmployees } from "../hooks/employeeHooks";
+import { useGetEmployees, useSearchEmployees } from "../hooks/employeeHooks";
+import { useState } from "react";
 
 import {
   Table,
@@ -11,6 +12,7 @@ import {
 } from "../components/ui/table"
 
 import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,11 +24,26 @@ import {
 import { MoreHorizontal } from "lucide-react";
 
 export function Dashboard() {
+    const [department, setDepartment] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+
     const navigate = useNavigate();
 
-    const { data: response, error } = useGetEmployees();
+    const { data: allResponse, error } = useGetEmployees();
+    const employees = allResponse?.data || [];
 
-    const employees = response?.data || [];
+    const { data: searchResponse } = useSearchEmployees(searchTerm);
+    const employeesByDepartment = searchTerm ? (searchResponse?.data || []) : employees;
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        setSearchTerm(department.trim());
+    };
+
+    const handleClearSearch = () => {
+        setDepartment("");
+        setSearchTerm("");
+    };
 
     const handleAddEmployee = () => {
         navigate("/add")
@@ -58,12 +75,35 @@ export function Dashboard() {
         );
     }
 
+    const dataToShow = searchTerm ? employeesByDepartment : employees;
+
     return (
         
         <div className="p-6">
             
             <div className="w-1/2 mx-auto">
                 <h1 className="text-2xl font-bold mb-6 text-center">Employee Directory</h1>
+
+                {/* Search input */}
+                <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+                    <Input
+                        type="text"
+                        placeholder="Search by department"
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                    />
+                    <Button 
+                        type="submit" 
+                        className="px-8"
+                    >
+                        Search
+                    </Button>
+                    {searchTerm && (
+                        <Button variant="outline" onClick={handleClearSearch}>
+                            Clear
+                        </Button>
+                    )}
+                </form>
 
                 {/* Add button */}
                 <div className="flex justify-end items-center mb-4">
@@ -84,14 +124,14 @@ export function Dashboard() {
                     </TableHeader>
                     
                     <TableBody>
-                        {employees.length === 0 ? (
+                        {dataToShow.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center text-gray-500 py-6">
                                     No employee records found.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            employees.map((employee) => (
+                            dataToShow.map((employee) => (
                                 <TableRow key={employee.id}>
                                     <TableCell className="font-medium">{`${employee.first_name} ${employee.last_name}`}</TableCell>
                                     <TableCell>{employee.department}</TableCell>

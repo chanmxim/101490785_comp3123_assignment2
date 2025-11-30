@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createEmployee, deleteEmployee, fetchEmployeeById, fetchEmployees, updateEmployee } from "../services/employeeService";
+import { createEmployee, deleteEmployee, fetchEmployeeById, fetchEmployees, searchEmployeesByDepartment, updateEmployee } from "../services/employeeService";
 
 // Constants to prevent typos in cache handling
 export const EMPLOYEE_KEYS = {
     all: ["employees"],
     list: (filter) => [...EMPLOYEE_KEYS.all, "list", filter],
-    details: (id) => [...EMPLOYEE_KEYS.all, "detail", id]
+    details: (id) => [...EMPLOYEE_KEYS.all, "detail", id],
+    department: (department_name) => [...EMPLOYEE_KEYS.all, "department", department_name]
 };
 
 // Queries
@@ -25,6 +26,15 @@ export const useGetEmployeeDetails = (id) => {
         enabled: !!id
     })
 }
+
+export const useSearchEmployees = (department) => {
+    return useQuery({
+        queryKey: EMPLOYEE_KEYS.department(department),
+        queryFn: () => searchEmployeesByDepartment(department),
+        enabled: !!department,
+        keepPreviousData: false,
+    });
+};
 
 export const useAddEmployee = () => {
     const queryClient = useQueryClient();

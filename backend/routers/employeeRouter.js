@@ -1,14 +1,17 @@
 import express from "express";
 import { body } from "express-validator";
 
-import { getAllEmployees, createEmployee, getEmployeeById, updateEmployeeById, deleteEmployeeById } from "../controllers/employeeController.js";
+import { getAllEmployees, createEmployee, getEmployeeById, updateEmployeeById, deleteEmployeeById, searchEmployeesByDepartment } from "../controllers/employeeController.js";
+import { auth } from "../middleware/authMiddleware.js";
 
 
 const employeeRouter = express.Router();
 
-employeeRouter.get("/employees", getAllEmployees);
+employeeRouter.get("/employees", auth, getAllEmployees);
 
-employeeRouter.post("/employees", 
+employeeRouter.get("/employees/search", auth, searchEmployeesByDepartment);
+
+employeeRouter.post("/employees", auth,
     [
         body("first_name")
             .notEmpty().withMessage("First name is required"),
@@ -33,9 +36,9 @@ employeeRouter.post("/employees",
     ],
     createEmployee);
 
-employeeRouter.get("/employees/:eid", getEmployeeById);
+employeeRouter.get("/employees/:eid", auth, getEmployeeById);
 
-employeeRouter.put("/employees/:eid",
+employeeRouter.put("/employees/:eid", auth,
     [
         body("first_name")
             .optional()
@@ -67,6 +70,6 @@ employeeRouter.put("/employees/:eid",
     ]
     ,updateEmployeeById);
 
-employeeRouter.delete("/employees/:eid", deleteEmployeeById);
+employeeRouter.delete("/employees/:eid", auth, deleteEmployeeById);
 
 export default employeeRouter;

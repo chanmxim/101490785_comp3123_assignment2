@@ -13,6 +13,12 @@ export const fetchEmployeeById = async (id) => {
     return response.data;
 }
 
+export const searchEmployeesByDepartment = async (department) => {
+    const params = department ? { department } : {};
+    const response = await api.get("/emp/employees/search", { params });
+    return response.data;
+};
+
 export const createEmployee = async (employeeData) => {
     const response = await api.post(`/emp/employees`, employeeData)
 
