@@ -25,9 +25,8 @@ const initialEmployeeState = {
 
 export function AddEmployee() {
     const [employee, setEmployee] = useState(initialEmployeeState);
-    
+    const [image, setImage] = useState(null);
     const { mutate, isSuccess, error } = useAddEmployee();
-
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -38,15 +37,23 @@ export function AddEmployee() {
         }));
     };
 
+    const handleFileChange = (e) => {
+        setImage(e.target.files[0]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        const payload = {
-            ...employee,
-            salary: parseFloat(employee.salary) || 0,
-        };
+        const formData = new FormData();
+        Object.keys(employee).forEach(key => {
+            formData.append(key, employee[key]);
+        });
+
+        if (image) {
+            formData.append("photo", image);
+        }
         
-        mutate(payload);
+        mutate(formData);
     };
     
     // Handle successful submission (side effect)
@@ -185,6 +192,16 @@ export function AddEmployee() {
                                     required
                                     value={employee.date_of_joining}
                                     onChange={handleChange}
+                                />
+                            </div>
+                            {/* Upload Photo */}
+                            <div className="grid gap-2 col-span-1 md:col-span-2">
+                                <Label htmlFor="photo">Upload Photo</Label>
+                                <Input
+                                    id="photo"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
                                 />
                             </div>
                         </div>

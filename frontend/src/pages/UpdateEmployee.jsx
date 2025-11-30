@@ -29,6 +29,7 @@ export function UpdateEmployee() {
     const navigate = useNavigate();
 
     const [employee, setEmployee] = useState(initialEmployeeState); 
+    const [image, setImage] = useState(null);
 
     const { data: response } = useGetEmployeeDetails(employeeId);
     const fetchedEmployee = response?.data || [];
@@ -40,7 +41,7 @@ export function UpdateEmployee() {
     } = useUpdateEmployee();
 
     useEffect(() => {
-        console.log(fetchedEmployee)
+
         if (fetchedEmployee) {
             // Format as YYYY-MM-DD for the input[type=date]
             const dateOnly = fetchedEmployee.date_of_joining ? fetchedEmployee.date_of_joining.split('T')[0] : '';
@@ -60,6 +61,9 @@ export function UpdateEmployee() {
         }
     }, [updateSuccess, navigate]);
 
+    const handleFileChange = (e) => {
+        setImage(e.target.files[0]);
+    };
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -76,8 +80,17 @@ export function UpdateEmployee() {
             console.error("Cannot update: Employee details are not loaded or ID is missing.");
             return;
         }
+
+        const formData = new FormData();
+        Object.keys(employee).forEach(key => {
+            formData.append(key, employee[key]);
+        });
+
+        if (image) {
+            formData.append("photo", image);
+        }
         
-        mutate({ id: employeeId, formData: employee });
+        mutate({ id: employeeId, formData: formData });
     };
     
     const formTitle = `Edit Details for Employee ID: ${employeeId}`;
@@ -192,6 +205,16 @@ export function UpdateEmployee() {
                                         required
                                         value={employee.date_of_joining}
                                         onChange={handleChange}
+                                    />
+                                </div>
+                                {/* Upload Photo */}
+                                <div className="grid gap-2 col-span-1 md:col-span-2">
+                                    <Label htmlFor="photo">Upload Photo</Label>
+                                    <Input
+                                        id="photo"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
                                     />
                                 </div>
                             </div>

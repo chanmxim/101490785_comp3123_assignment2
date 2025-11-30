@@ -10,6 +10,7 @@ import { AddEmployee } from './pages/AddEmployee';
 import { UpdateEmployee } from './pages/UpdateEmployee';
 import { DeleteEmployee } from './pages/DeleteEmployee';
 import { EmployeeDetails } from './pages/EmployeeDetails';
+import { Navbar } from './components/Navbar';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -34,6 +35,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         
         <BrowserRouter>
+
+          <Navbar />
+
           <Routes>
             <Route path="/login" element={<Login />}/>
             <Route path="/signup" element={<Signup />}/>

@@ -3,6 +3,7 @@ import { body } from "express-validator";
 
 import { getAllEmployees, createEmployee, getEmployeeById, updateEmployeeById, deleteEmployeeById, searchEmployeesByDepartment } from "../controllers/employeeController.js";
 import { auth } from "../middleware/authMiddleware.js";
+import { upload } from "../middleware/uploadMiddleware.js";
 
 
 const employeeRouter = express.Router();
@@ -12,6 +13,7 @@ employeeRouter.get("/employees", auth, getAllEmployees);
 employeeRouter.get("/employees/search", auth, searchEmployeesByDepartment);
 
 employeeRouter.post("/employees", auth,
+    upload.single("photo"),
     [
         body("first_name")
             .notEmpty().withMessage("First name is required"),
@@ -39,6 +41,7 @@ employeeRouter.post("/employees", auth,
 employeeRouter.get("/employees/:eid", auth, getEmployeeById);
 
 employeeRouter.put("/employees/:eid", auth,
+    upload.single("photo"),
     [
         body("first_name")
             .optional()

@@ -74,6 +74,17 @@ export function EmployeeDetails() {
                 
                 <CardContent className="space-y-4">
                     
+                    {/* Profile Photo */}
+                    {employee.photo && (
+                        <div className="flex justify-center mb-6">
+                            <img
+                                src={`data:${employee.photoType};base64,${employee.photo}`}
+                                alt="Employee"
+                                className="w-40 h-40 object-cover rounded-full shadow-md border"
+                            />
+                        </div>
+                    )}
+
                     <h3 className="text-xl font-semibold text-gray-700 mt-4 border-b pb-1">Contact & Personal</h3>
                     <DetailField label="Email" value={employee.email} />
                     

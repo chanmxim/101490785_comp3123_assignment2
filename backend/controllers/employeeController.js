@@ -18,7 +18,7 @@ export const getAllEmployees = async (req, res) => {
             date_of_joining: employee.date_of_joining,
             department: employee.department
         }))
-
+        
         return res.status(200).json({
             status: true,
             data: response
@@ -82,7 +82,7 @@ export const createEmployee = async (req, res) => {
             date_of_joining, 
             department 
         } = req.body;
-
+        
         // Check if employee with such email exists
         const existingEmail = await Employee.findOne({ email });
 
@@ -102,6 +102,8 @@ export const createEmployee = async (req, res) => {
             salary,
             date_of_joining,
             department,
+            photo: req.file?.buffer,
+            photoType: req.file?.mimetype,
         });
 
         await employee.save();
@@ -154,7 +156,9 @@ export const getEmployeeById = async (req, res) => {
             position: employee.position,
             salary: employee.salary,
             date_of_joining: employee.date_of_joining,
-            department: employee.department
+            department: employee.department,
+            photo: employee.photo?.toString("base64"),
+            photoType: employee.photoType
         }
 
         return res.status(200).json({
@@ -195,6 +199,11 @@ export const updateEmployeeById = async (req, res) => {
         }
 
         const dataToUpdate = req.body;
+
+        if (req.file) {
+            dataToUpdate.photo = req.file.buffer;
+            dataToUpdate.photoType = req.file.mimetype;
+        }
 
         // Update employee
         const updatedEmployee = await Employee.findByIdAndUpdate(eid, dataToUpdate, { new: true });

@@ -39,7 +39,9 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
-    }
+    },
+    photo: { type: Buffer },
+    photoType: { type: String },
 }, {
     timestamps: true
 })
